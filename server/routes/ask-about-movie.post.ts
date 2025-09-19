@@ -1,12 +1,28 @@
-import { defineEventHandler, readBody, setResponseHeaders } from 'h3';
+import { defineEventHandler, readBody, setResponseHeaders, getHeader, getMethod } from 'h3';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export default defineEventHandler(async (event) => {
-  // Set CORS headers
+  // Handle preflight OPTIONS request
+  if (getMethod(event) === 'OPTIONS') {
+    setResponseHeaders(event, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+      'Access-Control-Max-Age': '86400'
+    });
+    return '';
+  }
+
+  // Get the origin from the request
+  const origin = getHeader(event, 'origin');
+  const allowedOrigins = ['https://www.netflix.com', 'https://netflix.com'];
+  const allowedOrigin = allowedOrigins.includes(origin || '') ? origin : '*';
+
+  // Set CORS headers for the actual request
   setResponseHeaders(event, {
-    'Access-Control-Allow-Origin': 'https://www.netflix.com, https://netflix.com, *',
+    'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type'
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With'
   });
 
   const body = await readBody(event);
