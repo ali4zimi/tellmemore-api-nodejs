@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export default defineEventHandler(async (event) => {
   // Set CORS headers
   setResponseHeaders(event, {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://www.netflix.com, https://netflix.com, *',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
   });
